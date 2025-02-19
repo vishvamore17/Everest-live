@@ -102,8 +102,9 @@ html {
   min-height: 10svh;
 }
 
+
 .p-6{
-  background-color: #fafafa;
+  padding: 1.5rem;
 }
 .card-container {
   width: 100%; /* Adjust as needed */
@@ -116,7 +117,7 @@ html {
 .card {
   width: 100%; /* Adjust as needed */
   max-width: 500px; /* Prevent it from being too wide */
-  margin: 0 auto; /* Center it */
+  margin-top: 8px;
   border-radius: 8px;
   background-color: white;
   padding: 10px;

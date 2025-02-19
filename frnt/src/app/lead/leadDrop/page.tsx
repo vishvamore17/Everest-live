@@ -10,6 +10,9 @@ import { MdCancel } from "react-icons/md";
 import { AppSidebar } from "@/components/app-sidebar"
 import { Separator } from "@/components/ui/separator"
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from "@/components/ui/breadcrumb"
+import { Meteors } from "@/components/ui/meteors";
+import { useRouter } from "next/navigation"; // Import useRouter
+import { ModeToggle } from "@/components/ModeToggle"
 
 interface Lead {
   _id: string;
@@ -45,7 +48,8 @@ export default function App() {
   const [draggedOver, setDraggedOver] = useState<string | null>(null);
   const [selectedLead, setSelectedLead] = React.useState<Lead | null>(null);
   const [isModalOpen, setIsModalOpen] = React.useState(false);
-  
+  const router = useRouter(); // Initialize router
+
   const handleLeadClick = (lead: Lead) => {
     setSelectedLead(lead);
     setIsModalOpen(true);
@@ -78,11 +82,11 @@ export default function App() {
   };
 
   const statusColors: Record<string, string> = {
-    Proposal: "bg-blue-300 text-gray-800",
-    New: "bg-blue-300 text-gray-800",
-    Discussion: "bg-blue-300 text-gray-800",
-    Demo: "bg-blue-300 text-gray-800",
-    Decided: "bg-blue-300 text-gray-800",
+    Proposal: "bg-purple-200 text-gray-800 border-2 border-purple-900 shadow-lg shadow-purple-900/50",
+    New: "bg-purple-200 text-gray-800 border-2 border-purple-900 shadow-lg shadow-purple-900/50",
+    Discussion: "bg-purple-200 text-gray-800 border-2 border-purple-900 shadow-lg shadow-purple-900/50",
+    Demo: "bg-purple-200 text-gray-800 border-2 border-purple-900 shadow-lg shadow-purple-900/50",
+    Decided: "bg-purple-200 text-gray-800 border-2 border-purple-900 shadow-lg shadow-purple-900/50",
   };
 
   const formatDate = (dateString: string): string => {
@@ -128,133 +132,129 @@ export default function App() {
 
   return (
     <SidebarProvider>
-      <AppSidebar/>
-      <div className="row">
+      <AppSidebar />
+      <div className="flex flex-col w-full">
         <SidebarInset>
-                <header className="row h-16 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-12">
-                    <div className="row items-center gap-2 px-4 w-full">
-                        <SidebarTrigger className="-ml-1"/>
-                        <Separator orientation="vertical" className="mr-2 h-4"/>
-                        <Breadcrumb>
-                            <BreadcrumbList>
-                                <BreadcrumbItem className="hidden md:block">
-                                    <BreadcrumbLink href="/dashboard">
-                                        Dashboard
-                                    </BreadcrumbLink>
-                                    <BreadcrumbLink href="/lead/leadDrop">
-                                   
-                                    </BreadcrumbLink>
-                                </BreadcrumbItem>
-                                <BreadcrumbSeparator className="hidden md:block"/>
-                                <BreadcrumbItem>
-                                    <BreadcrumbPage>Drag & Drop</BreadcrumbPage>
-                                </BreadcrumbItem>
-                            </BreadcrumbList>
-                        </Breadcrumb>
-                    </div>
-                </header>
-                </SidebarInset>
-    <div className="p-6">
-      {error && <p className="text-red-500 text-center">{error}</p>}
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
-        {Object.keys(statusColors).map((status) => {
-          const leadsInStatus = groupedLeads[status] || [];
-          const totalAmount = leadsInStatus.reduce((sum, lead) => sum + lead.amount, 0);
+          <header className="flex h-16 items-center px-4 w-full border-b shadow-sm">
+            <SidebarTrigger className="mr-2" />
+             <ModeToggle/>
+            <Separator orientation="vertical" className="h-6 mx-2" />
+            <Breadcrumb>
+              <BreadcrumbList className="flex items-center space-x-2">
+                <BreadcrumbItem className="hidden md:block">
+                  <BreadcrumbLink href="/dashboard">Dashboard</BreadcrumbLink>
+                </BreadcrumbItem>
+                <BreadcrumbSeparator className="hidden md:block" />
+                <BreadcrumbItem>
+                  <BreadcrumbPage>Drag & Drop</BreadcrumbPage>
+                </BreadcrumbItem>
+              </BreadcrumbList>
+            </Breadcrumb>
+          </header>
+        </SidebarInset>
 
-          return (
-            <div
-              key={status}
-              className={`p-4 rounded-lg  min-h-[530px] transition-all ${draggedOver === status }`}
-              onDrop={(e) => handleDrop(e, status)}
-              onDragOver={(e) => {
-                e.preventDefault();
-                setDraggedOver(status);
-              }}
-              onDragLeave={() => setDraggedOver(null)}
-            >
-              <h2 className={`text-sm font-bold mb-4 px-5 py-2 rounded-lg ${statusColors[status]}`}>{status}</h2>
-              <div className="p-3 bg-white-200 rounded-md shadow">
-                <p className="text-sm font-semibold text-gray-500">Total Leads: {leadsInStatus.length}</p>
-                <p className="text-sm font-semibold text-gray-500">Total Amount: ₹{totalAmount}</p>
-              </div>
-              <div
-                className="scrollable"
-              >
-                {leadsInStatus.length === 0 ? (
-                  <p className="text-gray-500 text-center">No leads available</p>
-                ) : (
-                  leadsInStatus.map((lead) => (
-                    <div
-                    key={lead._id}
-                    className="card-container"
+        <div className="p-6">
+          {error && <p className="text-red-500 text-center">{error}</p>}
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
+            {Object.keys(statusColors).map((status) => {
+              const leadsInStatus = groupedLeads[status] || [];
+              const totalAmount = leadsInStatus.reduce((sum, lead) => sum + lead.amount, 0);
+
+              return (
+                <div
+                  key={status}
+                  className={`p-4 rounded-lg  min-h-[530px] transition-all ${draggedOver === status}`}
+                  onDrop={(e) => handleDrop(e, status)}
+                  onDragOver={(e) => {
+                    e.preventDefault();
+                    setDraggedOver(status);
+                  }}
+                  onDragLeave={() => setDraggedOver(null)}
                 >
-                    <div
-                        className="card"
-                        draggable
-                        onDragStart={(e) => handleDragStart(e, lead, status)}
-                        onClick={() => handleLeadClick(lead)}
-                    >
-                      
-                        <p>Company Name: <span>{lead.companyName}</span></p>
-                        <p>Product: <span>{lead.productName}</span></p>
-                        <p>Amount: <span>₹{lead.amount}</span></p>
-                        <p>Next Date: <span>{formatDate(lead.endDate)}</span></p>
-                       
-                    </div>
+                  <h2 className={`text-sm font-bold mb-4 px-5 py-2 rounded-lg ${statusColors[status]}`}>{status}</h2>
+                  <div className="p-3 bg-[#FAF3DD]   rounded-md shadow">
+                    <p className="text-sm font-semibold text-gray-500">Total Leads: {leadsInStatus.length}</p>
+                    <p className="text-sm font-semibold text-gray-500">Total Amount: ₹{totalAmount}</p>
+                  </div>
+                  <div
+                    className="scrollable"
+                  >
+                    {leadsInStatus.length === 0 ? (
+                      <p className="text-gray-500 text-center">No leads available</p>
+                    ) : (
+                      leadsInStatus.map((lead) => (
+                        <div
+                          key={lead._id}
+                          className="card-container  mt-4"
+                        >
+                          <div
+                            className="card"
+                            draggable
+                            onDragStart={(e) => handleDragStart(e, lead, status)}
+                            onClick={() => handleLeadClick(lead)}
+                          >
+
+                            <p>Company Name: <span>{lead.companyName}</span></p>
+                            <p>Product: <span>{lead.productName}</span></p>
+                            <p>Amount: <span>₹{lead.amount}</span></p>
+                            <p>Next Date: <span>{formatDate(lead.endDate)}</span></p>
+
+                          </div>
+                        </div>
+
+                      ))
+                    )}
+                  </div>
                 </div>
-                
-                  ))
-                )}
+              );
+            })}
+          </div>
+
+          {isModalOpen && selectedLead && (
+            <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+              <div className="w-full max-w-lg relative">
+                {/* Meteor Effect Background */}
+                <div className="absolute inset-0 h-full w-full bg-gradient-to-r from-blue-500 to-teal-500 transform scale-[0.80] rounded-full blur-3xl" />
+
+                {/* Modal Content */}
+                <div className="relative shadow-xl bg-gray-900 border border-gray-800 px-6 py-8 rounded-2xl">
+                  {/* Close Button */}
+                  <div
+                    className="absolute top-3 right-3 h-8 w-8 rounded-full border border-gray-500 flex items-center justify-center cursor-pointer"
+                    onClick={() => {
+                      setIsModalOpen(false); // Close Modal
+                    }}
+                  >
+                    <MdCancel className="text-white text-2xl"/>
+                      
+                  </div>
+
+                  {/* Title */}
+                  <h1 className="font-bold text-2xl text-white mb-6 text-center">Lead Details</h1>
+
+                  {/* Lead Details in Two Columns */}
+                  <div className="grid grid-cols-2 gap-4 text-white">
+                    {Object.entries(selectedLead)
+                      .filter(([key]) => !["_id", "isActive", "createdAt", "updatedAt"].includes(key))
+                      .map(([key, value]) => (
+                        <p key={key} className="text-sm">
+                          <strong>{key.charAt(0).toUpperCase() + key.slice(1)}:</strong>{" "}
+                          {["date", "endDate"].includes(key) && value
+                            ? new Date(value).toLocaleDateString()
+                            : value || "N/A"}
+                        </p>
+                      ))}
+                  </div>
+
+                  {/* Meteor Effect */}
+                  <Meteors number={20} />
+                </div>
               </div>
             </div>
-          );
-        })}
-      </div>
+          )}
 
-      {isModalOpen && selectedLead && (
-        <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-60 backdrop-blur-sm"
-          onClick={closeModal}
-        >
-          <div
-            className="modal-content p-6 rounded-md shadow-lg w-full max-w-3xl"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div className="modal-header">
-              <h2 className="text-xl font-semibold text-gray-800 mb-4">
-                Lead Details
-              </h2>
-              <button
-                onClick={closeModal}
-                className="text-xl font-semibold text-gray-600 hover:text-red-600"
-              >
-                <MdCancel />
-              </button>
-            </div>
-            <div className="form-content grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 gap-6">
-              {Object.entries(selectedLead)
-                .filter(
-                  ([key]) =>
-                    !["_id", "isActive", "createdAt", "updatedAt"].includes(key)
-                ) // Exclude _id, isActive, createdAt, updatedAt
-                .map(([key, value]) => (
-                  <p key={key} className="mb-4">
-                    <strong>
-                      {key.charAt(0).toUpperCase() + key.slice(1)}:
-                    </strong>{" "}
-                    {key === "date" || key === "endDate"
-                      ? value
-                        ? new Date(value).toLocaleDateString()
-                        : "N/A"
-                      : value || "N/A"}
-                  </p>
-                ))}
-            </div>
-          </div>
         </div>
-      )}
-    </div>
-    </div>
+      </div>
     </SidebarProvider>
   );
 }

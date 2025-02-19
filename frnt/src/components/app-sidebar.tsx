@@ -135,7 +135,7 @@ const data = {
         },
         {
           title: "Drag & Drop",
-          url: "",
+          url: "/deal/dealDrop",
         }
       ],
     },
@@ -159,7 +159,7 @@ const data = {
         },
         {
           title: "Drag & Drop",
-          url: "",
+          url: "/task/taskDrop",
         }
       ],
     },

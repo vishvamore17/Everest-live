@@ -10,6 +10,7 @@ import { AppSidebar } from "@/components/app-sidebar"
 import { Separator } from "@/components/ui/separator"
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from "@/components/ui/breadcrumb"
 import { Button } from "@/components/ui/button" // Import Button component
+import { ModeToggle } from "@/components/ModeToggle"
 
 
 export default function CertificatePage() {
@@ -20,6 +21,7 @@ export default function CertificatePage() {
                 <header className="flex h-16 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-12">
                     <div className="flex items-center gap-2 px-4 w-full">
                         <SidebarTrigger className="-ml-1"/>
+                        <ModeToggle/>
                         <Separator orientation="vertical" className="mr-2 h-4"/>
                         <Breadcrumb>
                             <BreadcrumbList>
@@ -56,17 +58,6 @@ export default function CertificatePage() {
                         </CardContent>
                     </Card>
                 </div>
-                    <Card className="max-w-2xl mx-auto">
-                        <CardHeader>
-                            <CardTitle className="text-3xl font-bold text-center">Lead Manager</CardTitle>
-                            <CardDescription className="text-center">
-                                Manage and track your leads effectively.
-                            </CardDescription>
-                        </CardHeader>
-                        <CardContent>
-                            <Drag/>
-                        </CardContent>
-                    </Card>
             </SidebarInset>
         </SidebarProvider>
     )
