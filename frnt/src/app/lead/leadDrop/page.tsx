@@ -66,9 +66,13 @@ export default function App() {
         const fetchedLeads = await getAllLeads();
         groupLeadsByStatus(fetchedLeads);
       } catch (error) {
-        setError(error.message);
+        if (error instanceof Error) {
+          setError(error.message); // TypeScript now recognizes 'message'
+        } else {
+          setError("An unknown error occurred");
       }
     };
+  }
     fetchLeads();
   }, []);
 
@@ -114,8 +118,9 @@ export default function App() {
     setGroupedLeads((prev) => ({
       ...prev,
       [fromStatus]: prev[fromStatus]?.filter((l) => l._id !== lead._id) || [],
-      [toStatus]: [...(prev[toStatus] || []), updatedLead],
+      [toStatus]: [...(prev[toStatus] || []), updatedLead as Lead], // Explicitly cast updatedLead
     }));
+    
 
     try {
       const response = await fetch("http://localhost:8000/api/v1/lead/updateLeadStatus", {

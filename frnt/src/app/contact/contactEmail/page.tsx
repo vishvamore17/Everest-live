@@ -33,7 +33,7 @@ const EmailInput: React.FC = () => {
                                 </BreadcrumbItem>
                                 <BreadcrumbSeparator className="hidden md:block" />
                                 <BreadcrumbItem className="hidden md:block">
-                                    <BreadcrumbLink href="/reminder">Reminder</BreadcrumbLink>
+                                    <BreadcrumbLink href="/contact">Contact</BreadcrumbLink>
                                 </BreadcrumbItem>
                                 <BreadcrumbSeparator className="hidden md:block" />
                                 <BreadcrumbItem>
@@ -62,7 +62,7 @@ const EmailInput: React.FC = () => {
                                     placeholder="Recipient's email"
                                     value={to}
                                     onChange={(e) => setTo(e.target.value)}
-                                    className="input input-bordered input-secondary w-full max-w-xs" 
+                                    className="input input-bordered input-secondary w-full max-w-xs"
                                 />
                             </div>
 
@@ -73,8 +73,8 @@ const EmailInput: React.FC = () => {
                                     placeholder="Subject"
                                     value={subject}
                                     onChange={(e) => setSubject(e.target.value)}
-                                    className="input input-bordered input-secondary w-full max-w-xs" 
-                                    />
+                                    className="input input-bordered input-secondary w-full max-w-xs"
+                                />
                             </div>
 
                             <div>

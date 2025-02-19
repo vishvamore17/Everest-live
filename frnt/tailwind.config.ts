@@ -81,5 +81,8 @@ export default {
 		  },
   	}
   },
-  plugins: [require("tailwindcss-animate")],
+//   plugins: [require("tailwindcss-animate")],
+plugins: [require("daisyui"),    require("tailwindcss-animate"),  
+],
+
 } satisfies Config;
