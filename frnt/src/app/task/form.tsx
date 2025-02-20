@@ -7,7 +7,11 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { toast } from "@/hooks/use-toast";
-import { Loader2 } from "lucide-react";
+import { format } from "date-fns"
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
+import { CalendarIcon, Loader2 } from "lucide-react"
+import { Calendar } from "@/components/ui/calendar"
+import { cn } from "@/lib/utils"
 
 const taskSchema = z.object({
   subject: z.string().min(2, { message: "Subject is required." }),
@@ -16,9 +20,11 @@ const taskSchema = z.object({
   name: z.string().min(2, { message: "Name is required." }),
   assigned: z.string().min(2, { message: "Assigned person is required." }),
   taskDate: z.date().optional(),
-  dueDate: z.string().min(2, { message: "Due date is required." }),
+  dueDate: z.date().optional(),
   status: z.enum(["Pending", "Resolved", "In Progress"]),
   priority: z.enum(["High", "Medium", "Low"]),
+  notes: z.string().optional(),
+  
 });
 
 export default function Task() {
@@ -32,9 +38,10 @@ export default function Task() {
       name: "",
       assigned: "",
       taskDate: new Date(),
-      dueDate: "",
+      dueDate: undefined,
       status: "Pending",
       priority: "Medium",
+      notes: "",
     },
   });
 
@@ -42,7 +49,7 @@ export default function Task() {
     setIsSubmitting(true);
     try {
       // API call to create or update task
-      const response = await fetch("/api/task", {
+      const response = await fetch("http://localhost:8000/api/v1/task/createTask", {
         method: "POST", // or PUT if updating
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(values),
@@ -124,7 +131,9 @@ export default function Task() {
               <FormItem>
                 <FormLabel>Assigned To</FormLabel>
                 <FormControl>
-                  <Input placeholder="Enter the person assigned" {...field} />
+                  <Input 
+                  placeholder="Enter assignee's name" 
+                  {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -133,32 +142,70 @@ export default function Task() {
         </div>
 
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
-          <FormField
+        <FormField
             control={form.control}
-            name="taskDate"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Task Date</FormLabel>
-                <FormControl>
-                  <Input type="date" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
+                name="taskDate"
+                render={({ field }) => (
+                  <FormItem>
+                  <FormLabel>Date</FormLabel>
+                  <Popover>
+                      <PopoverTrigger asChild>
+                      <FormControl>
+                          <Button
+                          variant={"outline"}
+                          className={cn("w-full pl-3 text-left font-normal", !field.value && "text-muted-foreground")}
+                          >
+                          {field.value ? format(field.value, "dd-MM-yyyy") : <span>Pick a date</span>}
+                          <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                          </Button>
+                      </FormControl>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-auto p-0" align="start">
+                      <Calendar
+                          mode="single"
+                          selected={field.value}
+                          onSelect={field.onChange}
+                          disabled={(date) => date > new Date()}
+                          initialFocus
+                      />
+                      </PopoverContent>
+                  </Popover>
+                  <FormMessage />
+                  </FormItem>
             )}
-          />
-          <FormField
-            control={form.control}
-            name="dueDate"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Due Date</FormLabel>
-                <FormControl>
-                  <Input type="date" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+            />
+                    <FormField
+                    control={form.control}
+                    name="dueDate"
+                    render={({ field }) => (
+                        <FormItem>
+                        <FormLabel>Due Date</FormLabel>
+                        <Popover>
+                            <PopoverTrigger asChild>
+                            <FormControl>
+                                <Button
+                                variant={"outline"}
+                                className={cn("w-full pl-3 text-left font-normal", !field.value && "text-muted-foreground")}
+                                >
+                                {field.value ? format(field.value, "dd-MM-yyyy") : <span>Pick a date</span>}
+                                <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                                </Button>
+                            </FormControl>
+                            </PopoverTrigger>
+                            <PopoverContent className="w-auto p-0" align="start">
+                            <Calendar
+                                mode="single"
+                                selected={field.value}
+                                onSelect={field.onChange}
+                                disabled={(date) => date < new Date()}
+                                initialFocus
+                            />
+                            </PopoverContent>
+                        </Popover>
+                        <FormMessage />
+                        </FormItem>
+                    )}
+                    />
         </div>
 
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
@@ -197,6 +244,24 @@ export default function Task() {
             )}
           />
         </div>
+        
+        <FormField
+            control={form.control}
+            name="notes"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Task Notes</FormLabel>
+                <FormControl>
+                  <textarea
+                    {...field}
+                    placeholder="Enter task notes"
+                    className="w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
 
         <Button type="submit" className="w-full" disabled={isSubmitting}>
           {isSubmitting ? (

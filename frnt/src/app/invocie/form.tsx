@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect} from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -8,11 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { toast } from "@/hooks/use-toast";
-import { cn } from "@/lib/utils"
-import { format } from "date-fns"
-import { CalendarIcon, Loader2 } from "lucide-react"
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
-import { Calendar } from "@/components/ui/calendar"
+import { Loader2 } from "lucide-react";
 
 // Invoice schema validation with zod
 const formSchema = z.object({
@@ -59,52 +55,10 @@ export default function InvoiceForm() {
     },
   });
 
-
-  const { watch, setValue } = form;
-
-  
-  const amount = watch("amount") ?? 0; 
-  const discount = watch("discount") ?? 0;  
-  const gstRate = watch("gstRate") ?? 0; 
-  const paidAmount = watch("paidAmount") ?? 0;  
-  
-
-  useEffect(() => {
-    
-    const { totalWithoutGst, totalWithGst, remainingAmount } = calculateGST(amount, discount, gstRate, paidAmount);
-
-    
-    setValue("totalWithoutGst", totalWithoutGst);
-    setValue("totalWithGst", totalWithGst);
-    setValue("remainingAmount", remainingAmount);
-  }, [amount, discount, gstRate, paidAmount, setValue]);
-
-
-
-  const calculateGST = (
-    amount: number,
-    discount: number,
-    gstRate: number,
-    paidAmount: number
-  ) => {
-    
-    const discountedAmount = amount - amount * (discount / 100);
-    const gstAmount = discountedAmount * (gstRate / 100); 
-    const totalWithoutGst = discountedAmount;
-    const totalWithGst = discountedAmount + gstAmount; 
-    const remainingAmount = totalWithGst - paidAmount; 
-
-    return {
-      totalWithoutGst,
-      totalWithGst,
-      remainingAmount,
-    };
-  };
-
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsSubmitting(true);
     try {
-      const response = await fetch("http://localhost:8000/api/v1/invoice/invoiceAdd", {
+      const response = await fetch("/api/submit-invoice", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(values),
@@ -120,7 +74,7 @@ export default function InvoiceForm() {
         title: "Invoice Submitted",
         description: `Your invoice has been successfully submitted. ID: ${data.id}`,
       });
-      router.push(`/invoice/${data.id}`);
+      router.push(`/invoice/${data.id}`); // Redirect to the invoice details page
     } catch (error) {
       toast({
         title: "Error",
@@ -243,16 +197,7 @@ export default function InvoiceForm() {
               <FormItem>
                 <FormLabel>Amount</FormLabel>
                 <FormControl>
-                    <Input 
-                    placeholder="Enter amount" 
-                    type="number" 
-                    {...field} 
-                    onChange={(e) => {
-                      // Convert the string value to a number
-                      const value = e.target.valueAsNumber || 0; // Use `valueAsNumber` to get a number
-                      field.onChange(value); // Pass the number to the form
-                    }}
-                    />
+                  <Input placeholder="Enter amount" type="number" {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -261,23 +206,14 @@ export default function InvoiceForm() {
         </div>
 
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
-        <FormField
+          <FormField
             control={form.control}
             name="discount"
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Discount</FormLabel>
                 <FormControl>
-                  <Input 
-                  placeholder="Enter discount" 
-                  type="number" 
-                  {...field} 
-                  onChange={(e) => {
-                    // Convert the string value to a number
-                    const value = e.target.valueAsNumber || 0; // Use `valueAsNumber` to get a number
-                    field.onChange(value); // Pass the number to the form
-                  }}
-                  />
+                  <Input placeholder="Enter discount" type="number" {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -290,27 +226,15 @@ export default function InvoiceForm() {
               <FormItem>
                 <FormLabel>GST Rate (%)</FormLabel>
                 <FormControl>
-                  <select
-                    {...field}
-                    value={field.value} // Ensure the value is controlled
-                    onChange={(e) => field.onChange(Number(e.target.value))} // Convert to number
-                    className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  >
-                    <option value="">Select GST Rate</option>
-                    <option value="5">5%</option>
-                    <option value="12">12%</option>
-                    <option value="18">18%</option>
-                    <option value="28">28%</option>
-                  </select>
+                  <Input placeholder="Enter GST rate" type="number" {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
             )}
           />
-
         </div>
 
-        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 justify-items-stretch">
+        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
           <FormField
             control={form.control}
             name="status"
@@ -331,70 +255,6 @@ export default function InvoiceForm() {
               </FormItem>
             )}
           />
-
-<FormField
-            control={form.control}
-            name="date"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Invoice Date</FormLabel>
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <FormControl>
-                      <Button
-                        variant={"outline"}
-                        className={cn("w-full pl-3 text-left font-normal", !field.value && "text-muted-foreground")}
-                      >
-                        {field.value ? format(field.value, "dd-MM-yyyy") : <span>Pick a date</span>}
-                        <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                      </Button>
-                    </FormControl>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0" align="start">
-                    <Calendar
-                      mode="single"
-                      selected={field.value}
-                      onSelect={field.onChange}
-                      disabled={(date) => date > new Date()}
-                      initialFocus
-                    />
-                  </PopoverContent>
-                </Popover>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        </div>
-
-        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
-          <FormField
-            control={form.control}
-            name="paidAmount"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Paid Amount</FormLabel>
-                <FormControl>
-                  <Input placeholder="Enter paid amount" type="number" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="remainingAmount"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Remaining Amount</FormLabel>
-                <FormControl>
-                  <Input placeholder="Remaining Amount" type="number" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
         </div>
 
         <Button type="submit" className="w-full" disabled={isSubmitting}>

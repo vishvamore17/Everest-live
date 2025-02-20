@@ -76,7 +76,7 @@ export default function LeadForm() {
     async function onSubmit(values: z.infer<typeof formSchema>) {
         setIsSubmitting(true)
         try {
-            const response = await fetch("/api/submit-lead", {
+            const response = await fetch("http://localhost:8000/api/v1/lead/createLead", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(values),
@@ -180,17 +180,26 @@ export default function LeadForm() {
                         )}
                     />
                     <FormField
-                        control={form.control}
-                        name="amount"
-                        render={({ field }) => (
-                            <FormItem>
-                                <FormLabel>Amount</FormLabel>
-                                <FormControl>
-                                    <Input placeholder="Enter amount" type="number" {...field} />
-                                </FormControl>
-                                <FormMessage />
-                            </FormItem>
-                        )}
+                    control={form.control}
+                    name="amount"
+                    render={({ field }) => (
+                        <FormItem>
+                        <FormLabel>Amount</FormLabel>
+                        <FormControl>
+                            <Input
+                            placeholder="Enter amount"
+                            type="number"
+                            {...field}
+                            onChange={(e) => {
+                                // Convert the string value to a number
+                                const value = e.target.valueAsNumber || 0; // Use `valueAsNumber` to get a number
+                                field.onChange(value); // Pass the number to the form
+                            }}
+                            />
+                        </FormControl>
+                        <FormMessage />
+                        </FormItem>
+                    )}
                     />
                 </div>
 
@@ -210,7 +219,7 @@ export default function LeadForm() {
                     />
                     <FormField
                         control={form.control}
-                                       name="status"
+                        name="status"
                         render={({ field }) => (
                             <FormItem>
                                 <FormLabel>Status</FormLabel>
@@ -230,16 +239,31 @@ export default function LeadForm() {
                             </FormItem>
                         )}
                     />
-
                 </div>
 
                 <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
                     <FormField
                         control={form.control}
+                        name="contactNumber"
+                        render={({ field }) => (
+                            <FormItem>
+                                <FormLabel>Contact Number</FormLabel>
+                                <FormControl>
+                                    <Input placeholder="Enter contact number" {...field} />
+                                </FormControl>
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
+
+                </div>
+                <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
+                    <FormField
+                        control={form.control}
                         name="date"
                         render={({ field }) => (
-                            <FormItem className="flex flex-col">
-                                <FormLabel>Date</FormLabel>
+                            <FormItem>
+                                <FormLabel>Start Date</FormLabel>
                                 <Popover>
                                     <PopoverTrigger asChild>
                                         <FormControl>
@@ -247,7 +271,7 @@ export default function LeadForm() {
                                                 variant={"outline"}
                                                 className={cn("w-full pl-3 text-left font-normal", !field.value && "text-muted-foreground")}
                                             >
-                                                {field.value ? format(field.value, "PPP") : <span>Pick a date</span>}
+                                                {field.value ? format(field.value, "dd-MM-yyyy") : <span>Pick a date</span>}
                                                 <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
                                             </Button>
                                         </FormControl>
@@ -271,7 +295,7 @@ export default function LeadForm() {
                         control={form.control}
                         name="endDate"
                         render={({ field }) => (
-                            <FormItem className="flex flex-col">
+                            <FormItem>
                                 <FormLabel>End Date</FormLabel>
                                 <Popover>
                                     <PopoverTrigger asChild>
@@ -280,7 +304,7 @@ export default function LeadForm() {
                                                 variant={"outline"}
                                                 className={cn("w-full pl-3 text-left font-normal", !field.value && "text-muted-foreground")}
                                             >
-                                                {field.value ? format(field.value, "PPP") : <span>Pick a date</span>}
+                                                {field.value ? format(field.value, "dd-MM-yyyy") : <span>Pick a date</span>}
                                                 <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
                                             </Button>
                                         </FormControl>
@@ -299,9 +323,27 @@ export default function LeadForm() {
                             </FormItem>
                         )}
                     />
-
-
                 </div>
+
+                
+                    <FormField
+                        control={form.control}
+                        name="notes"
+                        render={({ field }) => (
+                            <FormItem>
+                                <FormLabel>Notes</FormLabel>
+                                <FormControl>
+                                    <textarea
+                                        placeholder="Enter notes"
+                                        {...field}
+                                        className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    />
+                                </FormControl>
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
+                
 
                 <Button type="submit" className="w-full" disabled={isSubmitting}>
                     {isSubmitting ? (
@@ -315,6 +357,5 @@ export default function LeadForm() {
                 </Button>
             </form>
         </Form>
-  
     )
 }

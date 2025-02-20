@@ -85,7 +85,9 @@ body {
   -ms-overflow-style: none; /* For Internet Explorer and Edge */
   padding: 10px;
 }
-
+.form-container {
+  padding: 1rem; /* Reduce form padding */
+}
 .scrollable::-webkit-scrollbar {
   display: none; /* For Chrome, Safari, and Opera */
 }
