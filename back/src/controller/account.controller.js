@@ -1,139 +1,131 @@
-const Invoice = require("../model/invoiceSchema.model");
+const Account = require("../model/accountSchema.model");
 const nodemailer = require("nodemailer");
 const { storeNotification } = require('./notification.controller');
 const cron = require('node-cron');
 
-const remindEvent = async () => {
-    const io = require('../index'); // Get the initialized socket.io instance
-    const now = new Date();
-    const nowIST = new Date(now.getTime() + (5 * 60 + 30) * 60000); // Convert UTC to IST
-    const todayIST = nowIST.toISOString().split('T')[0]; // Today's date in IST (YYYY-MM-DD)
-    console.log('Cron job running at (IST):', nowIST.toISOString());
+// const remindEvent = async () => {
+//     const io = require('../index'); // Get the initialized socket.io instance
+//     const now = new Date();
+//     const nowIST = new Date(now.getTime() + (5 * 60 + 30) * 60000); // Convert UTC to IST
+//     const todayIST = nowIST.toISOString().split('T')[0]; // Today's date in IST (YYYY-MM-DD)
+//     console.log('Cron job running at (IST):', nowIST.toISOString());
 
-    try {
-        // Fetch all unpaid invoices
-        const invoices = await Invoice.find({
-            date: { $gte: todayIST }, // Fetch events happening today or later
-            status: "Unpaid", // Only unpaid invoices
-        });
+//     try {
+//         // Fetch all unpaid invoices
+//         const invoices = await Invoice.find({
+//             date: { $gte: todayIST }, // Fetch events happening today or later
+//             status: "Unpaid", // Only unpaid invoices
+//         });
 
-        if (!invoices.length) {
-            console.log('No unpaid invoices to remind');
-            return;
-        }
+//         if (!invoices.length) {
+//             console.log('No unpaid invoices to remind');
+//             return;
+//         }
 
-        for (const invoice of invoices) {
-            const dueDate = new Date(invoice.date);
-            if (isNaN(dueDate.getTime())) {
-                console.error(`Invalid due date for invoice: ${invoice._id}`);
-                continue; // Skip invalid invoices
-            }
+//         for (const invoice of invoices) {
+//             const dueDate = new Date(invoice.date);
+//             if (isNaN(dueDate.getTime())) {
+//                 console.error(`Invalid due date for invoice: ${invoice._id}`);
+//                 continue; // Skip invalid invoices
+//             }
 
-            // Calculate reminder dates
-            const threeDaysBefore = new Date(dueDate);
-            threeDaysBefore.setDate(threeDaysBefore.getDate() - 3);
+//             // Calculate reminder dates
+//             const threeDaysBefore = new Date(dueDate);
+//             threeDaysBefore.setDate(threeDaysBefore.getDate() - 3);
 
-            const oneDayBefore = new Date(dueDate);
-            oneDayBefore.setDate(oneDayBefore.getDate() - 1);
+//             const oneDayBefore = new Date(dueDate);
+//             oneDayBefore.setDate(oneDayBefore.getDate() - 1);
 
-            const reminderDateType = todayIST === threeDaysBefore.toISOString().split('T')[0]
-                ? "3 Days Before"
-                : todayIST === oneDayBefore.toISOString().split('T')[0]
-                ? "1 Day Before"
-                : todayIST === dueDate.toISOString().split('T')[0]
-                ? "On Due Date"
-                : null;
+//             const reminderDateType = todayIST === threeDaysBefore.toISOString().split('T')[0]
+//                 ? "3 Days Before"
+//                 : todayIST === oneDayBefore.toISOString().split('T')[0]
+//                 ? "1 Day Before"
+//                 : todayIST === dueDate.toISOString().split('T')[0]
+//                 ? "On Due Date"
+//                 : null;
 
-            if (reminderDateType) {
-                console.log(`Reminder (${reminderDateType}): ${invoice.customerName} has an unpaid invoice`);
+//             if (reminderDateType) {
+//                 console.log(`Reminder (${reminderDateType}): ${invoice.customerName} has an unpaid invoice`);
 
-                // Emit reminder via socket.io
-                io.emit('reminder', {
-                    id: invoice._id,
-                    customerName: invoice.customerName,
-                    companyName: invoice.companyName,
-                    amount: invoice.remainingAmount,
-                    dueDate: dueDate.toISOString().split('T')[0], // Only date
-                    reminderType: reminderDateType,
-                });
-                console.log(`Reminder (${reminderDateType}) emitted for:`, invoice.customerName);
+//                 // Emit reminder via socket.io
+//                 io.emit('reminder', {
+//                     id: invoice._id,
+//                     customerName: invoice.customerName,
+//                     companyName: invoice.companyName,
+//                     amount: invoice.remainingAmount,
+//                     dueDate: dueDate.toISOString().split('T')[0], // Only date
+//                     reminderType: reminderDateType,
+//                 });
+//                 console.log(`Reminder (${reminderDateType}) emitted for:`, invoice.customerName);
              
-                // Example of emitting a notification event from backend
-                io.emit('notification', {
-                    _id: "invoice._id",
-                    title: `Reminder (${reminderDateType}): Unpaid Invoice for ${invoice.companyName}`,
-                    message: `Customer ${invoice.customerName} has an unpaid invoice of ₹${invoice.remainingAmount} for the product "${invoice.productName}". The due date is ${dueDate.toISOString().split('T')[0]}.`,
-                    type: 'reminder',
-                    createdAt: new Date().toISOString(),
+//                 // Example of emitting a notification event from backend
+//                 io.emit('notification', {
+//                     _id: "invoice._id",
+//                     title: `Reminder (${reminderDateType}): Unpaid Invoice for ${invoice.companyName}`,
+//                     message: `Customer ${invoice.customerName} has an unpaid invoice of ₹${invoice.remainingAmount} for the product "${invoice.productName}". The due date is ${dueDate.toISOString().split('T')[0]}.`,
+//                     type: 'reminder',
+//                     createdAt: new Date().toISOString(),
 
-                });
-                // Store notification in MongoDB
-                const notificationData = {
-                    title: `Invoice Reminder (${reminderDateType}): Unpaid Invoice for ${invoice.companyName}`,
-                    message: `Customer ${invoice.customerName} has an unpaid invoice of ₹${invoice.remainingAmount} for the product "${invoice.productName}". The due date is ${dueDate.toISOString().split('T')[0]}.`,
-                    type: 'reminder',
-                };
+//                 });
+//                 // Store notification in MongoDB
+//                 const notificationData = {
+//                     title: `Invoice Reminder (${reminderDateType}): Unpaid Invoice for ${invoice.companyName}`,
+//                     message: `Customer ${invoice.customerName} has an unpaid invoice of ₹${invoice.remainingAmount} for the product "${invoice.productName}". The due date is ${dueDate.toISOString().split('T')[0]}.`,
+//                     type: 'reminder',
+//                 };
 
-                await storeNotification(notificationData);
+//                 await storeNotification(notificationData);
 
-                // Send email reminder
-                const emailMessage = `Dear ${invoice.customerName},\n\nThis is a reminder (${reminderDateType}) to pay your outstanding invoice of ₹${invoice.remainingAmount}. Please make the payment at your earliest convenience.`;
+//                 // Send email reminder
+//                 const emailMessage = `Dear ${invoice.customerName},\n\nThis is a reminder (${reminderDateType}) to pay your outstanding invoice of ₹${invoice.remainingAmount}. Please make the payment at your earliest convenience.`;
 
-                await sendEmailReminder({
-                    params: { id: invoice._id },
-                    body: { message: emailMessage },
-                });
-                console.log(`Email sent (${reminderDateType}) for invoice #${invoice._id}`);
-            } else {
-                console.log(`No reminder needed for invoice #${invoice._id}`);
-            }
-        }
-    } catch (error) {
-        console.error('Error executing remindEvent API:', error);
-    }
-};
+//                 await sendEmailReminder({
+//                     params: { id: invoice._id },
+//                     body: { message: emailMessage },
+//                 });
+//                 console.log(`Email sent (${reminderDateType}) for invoice #${invoice._id}`);
+//             } else {
+//                 console.log(`No reminder needed for invoice #${invoice._id}`);
+//             }
+//         }
+//     } catch (error) {
+//         console.error('Error executing remindEvent API:', error);
+//     }
+// };
 
-// Schedule the cron job to run daily at midnight (IST)
-cron.schedule('0 * * * *', remindEvent); // Runs at midnight IST (18:30 UTC)
-
-
+// // Schedule the cron job to run daily at midnight (IST)
+// cron.schedule('0 * * * *', remindEvent); // Runs at midnight IST (18:30 UTC)
 
 
-const invoiceAdd = async (req, res) => {
+
+
+const accountAdd = async (req, res) => {
     try {
-        const { companyName, customerName, contactNumber, emailAddress, address, gstNumber, productName, amount, discount, gstRate, status, date, paidAmount } = req.body;
+        const { accountName, contactName, contactNumber, emailAddress, accountType1, industry, status, accountManager,startDate, endDate, address, description, companyName, bankDetails   } = req.body;
 
-        const discountedAmount = amount * (discount / 100);
-        const gstAmount = discountedAmount * (gstRate / 100);
-        const totalWithoutGst = discountedAmount;
-        const totalWithGst = discountedAmount + gstAmount;
-        const remainingAmount = totalWithGst - paidAmount;
-
-        const newInvoice = new Invoice({
-            companyName,
-            customerName,
+        const newAccount = new Account({
+            accountName,
+            contactName,
             contactNumber,
             emailAddress,
-            address,
-            gstNumber,
-            productName,
-            amount,
-            discount,
-            gstRate,
+            accountType1,
+            industry,
             status,
-            date,
-            totalWithoutGst,
-            totalWithGst,
-            paidAmount,
-            remainingAmount
+            accountManager,
+            startDate,
+            endDate,
+            address,
+            description,
+            companyName,
+            bankDetails
         });
 
-        const savedInvoice = await newInvoice.save();
-        res.status(201).json({ message: "Invoice added successfully", data: savedInvoice });
+        const savedAccount = await newAccount.save();
+        res.status(201).json({ message: "Account added successfully", data: savedAccount });
 
     } catch (error) {
-        console.error("Error adding invoice:", error);
-        res.status(500).json({ message: "Failed to add invoice", error: error.message });
+        console.error("Error adding account:", error);
+        res.status(500).json({ message: "Failed to add account", error: error.message });
     }
 };
 
@@ -416,30 +408,9 @@ const updateCustomMessage = async(req,res)=>{
       }
 }
 
-const getInvoicesByStatus = async (req, res) => {
-};
-
-const updateStatus = async (req, res) => {
-    const { invoiceId, status } = req.body;
-
-    try {
-        const invoice = await Invoice.findById(invoiceId);
-        if (!invoice) {
-            return res.status(404).json({ success: false, message: 'Invoice not found' });
-        }
-
-        invoice.status = status;
-        await invoice.save();
-
-        res.json({ success: true, message: 'invoice status updated successfully' });
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ success: false, message: 'Server error' });
-    }
-};
-
 module.exports = {
-    invoiceAdd,
+    accountAdd,
+
     updateInvoice,
     deleteInvoice,
     getAllInvoices,
@@ -449,6 +420,4 @@ module.exports = {
     sendEmailReminder,
     sendWhatsAppReminder,
     updateCustomMessage,
-    getInvoicesByStatus,
-    updateStatus
 };

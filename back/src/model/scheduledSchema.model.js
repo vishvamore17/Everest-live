@@ -41,21 +41,18 @@ const scheduledEventSchema = new mongoose.Schema({
     enum: ["Low", "low", "Medium", "medium", "High", "high"],
     // required: true,
   },
-  description: {
-    type: String,
-  },
-  reminder: {
-    type: Number,
+  date: {
+    type: Date,
   },
   recurrence: {
     type: String,
     enum: ["one-time", "Daily", "Weekly", "Monthly", "Yearly"],
   },
-  date: {
+  description: {
     type: String,
-    // required: true,
   },
-});
+
+}, { timestamps: true });
 
 const Scheduled = mongoose.model("scheduledevents", scheduledEventSchema);
 

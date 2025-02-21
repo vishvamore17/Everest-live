@@ -73,9 +73,16 @@ app.get(
   "/auth/google/callback",
   passport.authenticate("google", { failureRedirect: "/" }),
   (req, res) => {
-    res.redirect("http://localhost:3000/Dashboard");
+    const { isFirstLogin, token, email } = req.user;
+
+    const redirectTo = isFirstLogin
+      ? `http://localhost:3000/Profile`
+      : `http://localhost:3000/Dashboard`;
+
+    res.redirect(redirectTo);
   }
 );
+
 
 // Create HTTP server and attach Socket.IO
 const server = http.createServer(app);

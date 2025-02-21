@@ -29,13 +29,6 @@ const transporter = nodemailer.createTransport({
 const createContact = async (req, res) => {
   const { companyName, customerName, emailAddress, contactNumber, address, gstNumber, description } = req.body;
 
-  if (!companyName || !customerName || !emailAddress || !contactNumber || !address) {
-    return res.status(400).json({
-      success: false,
-      message: 'Companyname, name, email, phone, and address are required.',
-    });
-  }
-
   try {
     const newContact = new Contact({ companyName, customerName, emailAddress, contactNumber, address, gstNumber, description });
     const contact = await newContact.save();

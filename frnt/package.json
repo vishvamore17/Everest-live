@@ -29,6 +29,7 @@
     "@react-pdf/renderer": "^4.2.1",
     "@tanstack/react-table": "^8.20.6",
     "add": "^2.0.6",
+    "axios": "^1.7.9",
     "better-sqlite3": "^11.8.1",
     "card": "^2.5.4",
     "class-variance-authority": "^0.7.1",

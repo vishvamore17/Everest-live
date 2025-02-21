@@ -21,7 +21,7 @@ const ownerSchema = new mongoose.Schema(
     website: {
       type:String
     },
-    bussinessRegistration: {
+    businessRegistration: {
       type:String,
       enum: ["Sole proprietorship" , "One person Company","Parternship","Private Limited"],
     },
@@ -56,6 +56,8 @@ const ownerSchema = new mongoose.Schema(
    incorporationCertificate:{
     type:String,
      },
+     dataFilled: { type: Boolean, default: true }, // Adding the flag to the schema
+
   },
   { timestamps: true }
 );

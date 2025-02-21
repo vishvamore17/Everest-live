@@ -21,8 +21,6 @@ const createScheduledEvent = async (req, res) => {
             });
         }
 
-       
-
 
         // Create a new event
         const newEvent = await Scheduled.create(eventData);

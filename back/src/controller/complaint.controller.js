@@ -1,28 +1,19 @@
 const Complaint = require('../model/complaintSchema.model');
 
-// Create a new complaint
 const createComplaint = async (req, res) => {
   try {
-    const { contactNumber, caseStatus, caseOrigin, subject, priority, date, time, complainerName } = req.body;
+    const { companyName, complainerName, contactNumber, emailAddress, subject, date, caseStatus, priority, caseOrigin,} = req.body;
 
-    // Validation
-    if (!contactNumber || !caseOrigin || !subject || !date || !time || !complainerName) {
-      return res.status(400).json({
-        success: false,
-        message: 'Missing required fields. Please provide all necessary fields.',
-      });
-    }
-
-    // Create complaint
     const newComplaint = new Complaint({
-      contactNumber,
-      caseStatus: caseStatus || 'Pending',
-      caseOrigin,
-      subject,
-      priority: priority || 'Medium',
-      date,
-      time,
+      companyName,
       complainerName,
+      contactNumber,
+      emailAddress,
+      subject,
+      date,
+      caseStatus: caseStatus || 'Pending',
+      priority: priority || 'Medium',
+      caseOrigin,
     });
 
     // Save to DB

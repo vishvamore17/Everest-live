@@ -17,7 +17,7 @@ const usersSchema = new mongoose.Schema(
         },
         password: {
             type: String,
-            required: true,
+            // required: true,
             trim: true
         },
         isVerified :{
@@ -31,7 +31,14 @@ const usersSchema = new mongoose.Schema(
         isFirstLogin:{
             type:Boolean,
             default:true
-        }
+        },
+        googleId: {
+            type: String,
+            // required: true, 
+            unique: true
+        },
+        // isProfileComplete: { type: Boolean, default: false } // New field
+
         // role: {
         //     type: String,
         //     required: true,
@@ -46,9 +53,6 @@ const usersSchema = new mongoose.Schema(
         //     type: Boolean,
         //     default: true
         // },
-        // googleId: {
-        //     type: String,
-        // }
 
     },
     {

@@ -53,7 +53,7 @@ const data = {
         { title: "Create", url: "/lead" },
         { title: "List", url: "/lead/list" },
         { title: "Graph", url: "/Lead-chart" },
-        { title: "Drag & Drop", url: "/lead/drag-drop" }
+        { title: "Drag & Drop", url: "/lead/leadDrop" }
       ],
     },
     {
@@ -64,7 +64,7 @@ const data = {
         { title: "Create", url: "/invoice" },
         { title: "List", url: "/invoice/list" },
         { title: "Graph", url: "/Invoice-chart" },
-        { title: "Drag & Drop", url: "/invoice/drag-drop" }
+        { title: "Drag & Drop", url: "/invoice/invoiceDrop" }
       ],
     },
     {
@@ -106,7 +106,7 @@ const data = {
       items: [
         { title: "Create", url: "/complaint" },
         { title: "List", url: "/complaint/list" },
-        { title: "Email", url: "/complaint/complaitEmail" }
+        { title: "Email", url: "/complaint/complaintEmail" }
       ],
     },
     {
@@ -125,7 +125,7 @@ const data = {
       icon: CirclePlay,
       items: [
         { title: "Create", url: "/account" },
-        { title: "List", url: "/account/list" }
+        { title: "List", url: "/account" }
       ],
     },
     {

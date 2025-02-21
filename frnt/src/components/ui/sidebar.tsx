@@ -318,7 +318,7 @@ const SidebarInset = React.forwardRef<
   HTMLDivElement,
   React.ComponentProps<"main">
 >(({ className, ...props }, ref) => {
-  return (
+  return (  
     <main
       ref={ref}
       className={cn(

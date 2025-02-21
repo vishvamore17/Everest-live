@@ -15,7 +15,7 @@ router.get("/getOwner/:id", OwnerController.getOwnerById);
 router.put("/updateOwner/:id", OwnerController.updateOwner);
 
 // Route to delete an owner by ID
-router.delete("/deleteOwner", OwnerController.deleteOwner);
+router.delete("/deleteOwner/:id", OwnerController.deleteOwner);
 
 // Route to get the count of owners
 router.get("/count", OwnerController.getOwnerCount);  // New route for owner count

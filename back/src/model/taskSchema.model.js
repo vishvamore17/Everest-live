@@ -4,7 +4,12 @@ const taskSchema = new mongoose.Schema({
   subject: { type: String },
   name: { type: String },
   relatedTo: { type: String },
-  dueDate: { type: String },
+  taskDate: {
+    type: Date,
+  },
+  dueDate: { 
+    type: Date,
+  },
   status: {
     type: String,
     enum: ["Pending", "Resolved", "In Progress"],
@@ -16,9 +21,13 @@ const taskSchema = new mongoose.Schema({
     default: "Medium",
   },
   assigned: { type: String },
-  lastReminderDate: { type: Date },
-  lastReminder: { type: String },
-});
+  // lastReminderDate: { type: Date },
+  // lastReminder: { type: String },
+  notes: {
+    type: String,
+    default: "",
+  },
+}, { timestamps: true });
 
 const Task = mongoose.model("tasks", taskSchema);
 

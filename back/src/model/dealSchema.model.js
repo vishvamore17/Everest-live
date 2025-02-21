@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 
-const leadSchema = new mongoose.Schema(
+const dealSchema = new mongoose.Schema(
   {
     companyName: {
       type: String,
@@ -59,9 +59,8 @@ const leadSchema = new mongoose.Schema(
       type: Boolean,
       default: true,
     },
-  }, { timestamps: true });
+  },{ timestamps: true});
 
+const Deal = mongoose.model("deals", dealSchema);
 
-const Lead = mongoose.model("leads", leadSchema);
-
-module.exports = Lead;
+module.exports = Deal;

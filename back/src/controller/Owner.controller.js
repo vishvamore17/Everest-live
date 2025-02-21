@@ -21,17 +21,6 @@ const addOwner = async (req, res) => {
       incorporationCertificate
     } = req.body;
 
-    // Validate required fields
-    if (!companyName || !ownerName || !contactNumber) {
-      return res.status(400).json({ message: 'Missing required fields' });
-    }
-
-    // Check if owner already exists based on email address
-    const existingOwner = await Owner.findOne({ emailAddress });
-    if (existingOwner) {
-      return res.status(409).json({ message: 'Owner already exists with this email address' });
-    }
-    
     const newOwner = new Owner({
       logo,
       companyName,
@@ -48,10 +37,11 @@ const addOwner = async (req, res) => {
       udhayamAadhar,
       stateCertificate,
       incorporationCertificate,
+      dataFilled: true // Save the flag in the database
     });
 
     await newOwner.save();
-    res.status(201).json({ message: 'Owner added successfully', data: newOwner });
+    res.status(201).json({ message: 'Owner added successfully', data: newOwner, datafilled:true });
   } catch (error) {
     console.error('Backend Error:', error); // Log server error
     res.status(400).json({ message: 'Error adding owner', error: error.message });

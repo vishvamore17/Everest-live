@@ -1,15 +1,11 @@
 const mongoose = require('mongoose')
-const Lead = require("../model/leadSchema.model");
+const Deal = require("../model/dealSchema.model");
 
-
-// Create a new lead
-const createLead = async (req, res) => {
+const createDeal = async (req, res) => {
     try {
-        // Ensure that the required fields are present in the request body
         const { companyName, customerName, amount, productName, emailAddress, address, date, status } = req.body;
-        
-        // Create the lead in the database
-        const leadData = new Lead({
+
+        const dealData = new Deal({
             companyName,
             customerName,
             contactNumber: req.body.contactNumber,  // Contact number is optional
@@ -25,16 +21,16 @@ const createLead = async (req, res) => {
             isActive: req.body.isActive ?? true,  // Default isActive to true if not provided
         });
 
-        await leadData.save();  // Save to the database
+        await dealData.save();  // Save to the database
 
         // Respond with a success message
         res.status(201).json({
             success: true,
-            message: "Lead created successfully",
-            data: leadData
+            message: "Deal created successfully",
+            data: dealData
         });
     } catch (error) {
-        console.error("Error creating lead:", error);
+        console.error("Error creating deal:", error);
         res.status(500).json({
             success: false,
             message: "Internal server error: " + error.message,
@@ -337,27 +333,8 @@ const updateStatus = async (req, res) => {
     }
 };
 
-const getLeadsByStatus = async (req, res) => {
-    const { status } = req.query;
-  
-    try {
-      const leads = await Lead.find({ status }, 'Name email amount');
-      res.status(200).json({
-        success: true,
-        data: leads
-      });
-    } catch (error) {
-      console.error(`Error fetching ${status} leads:`, error);
-      res.status(500).json({
-        success: false,
-        message: "Internal server error: " + error.message,
-      });
-    }
-  };
-  
-
 module.exports = {
-    createLead,
+    createDeal,
     getAllLeads,
     getLeadById,
     updateLead,
@@ -370,6 +347,5 @@ module.exports = {
     updateStatus,
     searchByMonth,
     searchByYear,
-    searchByDate,
-    getLeadsByStatus
+    searchByDate
 };
