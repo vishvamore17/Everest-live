@@ -131,6 +131,8 @@ const deleteComplaint = async (req, res) => {
   }
 };
 
+
+
 module.exports = {
   createComplaint,
   getAllComplaints,

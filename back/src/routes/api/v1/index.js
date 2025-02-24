@@ -16,6 +16,7 @@ const notificationRoutes = require("./notification.routes")
 const usersdRoutes = require("./users.routs")
 const ownerRoutes=require("./Owner.routes")
 const profileRoutes=require('./profile.routs')
+const globalRoutes =  require('./search.routes')
 // router.use("/user",userRouts)
 router.use("/invoice",invoiceRouts)
 router.use("/lead",leadRouts)
@@ -28,4 +29,5 @@ router.use("/notification", notificationRoutes);
 router.use("/user", usersdRoutes);
 router.use("/owner",ownerRoutes)
 router.use('/profile',profileRoutes)
+router.use('/search',globalRoutes)
 module.exports=router
